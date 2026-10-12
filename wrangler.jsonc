@@ -1,0 +1,9 @@
+{
+  // Cloudflare Workers static site for scribe.rocks (Workers Builds runs `npm run build`, then `npx wrangler deploy`).
+  "name": "scribe-rocks",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
