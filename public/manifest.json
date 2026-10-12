@@ -1,39 +1,14 @@
 {
-  "display": "standalone",
-  "scope": "./",
+  "name": "Scriberocks",
   "short_name": "Scriberocks",
-  "description": "Social Journal",
-  "screenshots": [
-    {
-      "alt": "no screenshots available yet",
-      "src": "/",
-      "type": "image/jpeg",
-      "sizes": "516x1116.67"
-    }
-  ],
-  "name": "A diamond is the final draft. Keep notes or share them to the Scribe community.",
-  "background_color": "rgb(20,20,25)",
-  "icons": [
-    {
-      "src": "https://www.dl.dropboxusercontent.com/s/goc5xbqqeg4q2t5/Scriberocks%20%283%29.png?dl=0",
-      "sizes": "64x64 32x32 24x24 16x16 192x192 194x194 512x512",
-      "type": "image/ico"
-    }
-  ],
+  "description": "A diamond is the final draft.",
+  "display": "standalone",
   "start_url": "/",
-  "theme_color": "rgb(20,20,25)",
-  "shortcuts": [
-    {
-      "name": "Home",
-      "url": "/",
-      "description": "Homepage",
-      "short_name": "HMPG",
-      "icons": [
-        {
-          "src": "https://www.dl.dropboxusercontent.com/s/goc5xbqqeg4q2t5/Scriberocks%20%283%29.png?dl=0",
-          "sizes": "192x192"
-        }
-      ]
-    }
+  "scope": "/",
+  "background_color": "#141419",
+  "theme_color": "#141419",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
   ]
 }
