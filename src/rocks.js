@@ -9,10 +9,15 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase.js";
+import { showingRevision, withRevision } from "./revisions.js";
+
+export { showingRevision, withRevision };
 
 // Same layout as FirestoreRockSyncService.swift:
-// scriberocks_users/{uid}/rocks/{UUID} { text, createdAt, updatedAt, isDiamond, deleted? }
-// Deletes are tombstones (deleted: true) so other devices learn about them.
+// scriberocks_users/{uid}/rocks/{UUID}
+//   { text, createdAt, updatedAt, isDiamond, revisions: [{text, createdAt, source}], revisionIndex, deleted? }
+// `text` is the revision being shown. Deletes are tombstones (deleted: true)
+// so other devices learn about them.
 
 const userDoc = (uid) => doc(db, "scriberocks_users", uid);
 const rocksCol = (uid) => collection(userDoc(uid), "rocks");
@@ -20,12 +25,21 @@ const rocksCol = (uid) => collection(userDoc(uid), "rocks");
 export function fromFirestore(id, data) {
   if (typeof data.text !== "string" || !data.createdAt) return null;
   const createdAt = data.createdAt.toDate();
+  let revisions = Array.isArray(data.revisions)
+    ? data.revisions
+        .filter((r) => typeof r?.text === "string" && r.createdAt)
+        .map((r) => ({ text: r.text, createdAt: r.createdAt.toDate(), source: r.source ?? "edited" }))
+    : [];
+  if (revisions.length === 0) revisions = [{ text: data.text, createdAt, source: "written" }];
+  const index = Number.isInteger(data.revisionIndex) ? data.revisionIndex : revisions.length - 1;
   return {
     id,
     text: data.text,
     createdAt,
     updatedAt: data.updatedAt?.toDate() ?? createdAt,
     isDiamond: data.isDiamond === true,
+    revisions,
+    revisionIndex: Math.min(Math.max(index, 0), revisions.length - 1),
     deleted: data.deleted === true,
   };
 }
@@ -46,13 +60,26 @@ export function watchRocks(uid, onRocks, onError) {
 }
 
 function write(uid, rock) {
+  const revisions = rock.revisions ?? [{ text: rock.text, createdAt: rock.createdAt, source: "written" }];
   return setDoc(doc(rocksCol(uid), rock.id), {
     text: rock.text,
     createdAt: Timestamp.fromDate(rock.createdAt),
     updatedAt: Timestamp.fromDate(rock.updatedAt),
     isDiamond: rock.isDiamond,
+    revisions: revisions.map((r) => ({ text: r.text, createdAt: Timestamp.fromDate(r.createdAt), source: r.source })),
+    revisionIndex: rock.revisionIndex ?? revisions.length - 1,
     ...(rock.deleted ? { deleted: true } : {}),
   });
+}
+
+export function reviseRock(uid, rock, text, source) {
+  const next = withRevision(rock, text, source);
+  return next === rock ? Promise.resolve() : updateRock(uid, next, {});
+}
+
+export function showRevision(uid, rock, index) {
+  const next = showingRevision(rock, index);
+  return next === rock ? Promise.resolve() : updateRock(uid, next, {});
 }
 
 export function addRock(uid, text) {
@@ -60,7 +87,15 @@ export function addRock(uid, text) {
   if (!trimmed) return null;
   const now = new Date();
   // Uppercase to match Swift's UUID().uuidString.
-  const rock = { id: crypto.randomUUID().toUpperCase(), text: trimmed, createdAt: now, updatedAt: now, isDiamond: false };
+  const rock = {
+    id: crypto.randomUUID().toUpperCase(),
+    text: trimmed,
+    createdAt: now,
+    updatedAt: now,
+    isDiamond: false,
+    revisions: [{ text: trimmed, createdAt: now, source: "written" }],
+    revisionIndex: 0,
+  };
   return write(uid, rock);
 }
 

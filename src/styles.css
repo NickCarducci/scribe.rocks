@@ -115,3 +115,5 @@ textarea { resize: vertical; line-height: 1.5; }
 .prose { display: flex; flex-direction: column; gap: 14px; }
 .card > .segmented { display: flex; }
 .card > .segmented button { flex: 1; }
+.history { display: inline-flex; align-items: center; gap: 2px; }
+.chevron { min-width: 36px; font-size: 1.2rem; padding: 0 8px; }

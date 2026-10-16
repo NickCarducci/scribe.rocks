@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { addRock, deleteRock, updateRock, watchRocks } from "../rocks.js";
+import { addRock, deleteRock, reviseRock, showRevision, updateRock, watchRocks } from "../rocks.js";
 import { downloadCSV } from "../csv.js";
 
 const FILTERS = ["All", "Rocks", "Diamonds"];
@@ -88,13 +88,36 @@ export default function Journal({ uid }) {
                   onCancel={() => setEditing(null)}
                   onSave={(text) => {
                     setEditing(null);
-                    if (text.trim() && text.trim() !== rock.text) act(updateRock(uid, rock, { text: text.trim() }));
+                    act(reviseRock(uid, rock, text, "edited"));
                   }}
                 />
               ) : (
                 <>
                   <p className="rock-text">{rock.text}</p>
                   <div className="row">
+                    {rock.revisions.length > 1 && (
+                      <div className="history" aria-label="Revisions">
+                        <button
+                          className="btn btn-quiet chevron"
+                          aria-label="Previous revision"
+                          disabled={rock.revisionIndex === 0}
+                          onClick={() => act(showRevision(uid, rock, rock.revisionIndex - 1))}
+                        >
+                          ‹
+                        </button>
+                        <span className="fine">
+                          {rock.revisionIndex + 1} of {rock.revisions.length}
+                        </span>
+                        <button
+                          className="btn btn-quiet chevron"
+                          aria-label="Next revision"
+                          disabled={rock.revisionIndex === rock.revisions.length - 1}
+                          onClick={() => act(showRevision(uid, rock, rock.revisionIndex + 1))}
+                        >
+                          ›
+                        </button>
+                      </div>
+                    )}
                     <time className="fine" dateTime={rock.createdAt.toISOString()}>
                       {rock.createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                     </time>
