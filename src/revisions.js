@@ -14,10 +14,10 @@ export function showingRevision(rock, index) {
   return { ...rock, text: rock.revisions[index].text, revisionIndex: index };
 }
 
-/** Saved versions, newest first (mirrors RockEditorViewModel.revisionChoices on iOS). */
+/** Saved versions, oldest to newest (mirrors RockEditorViewModel.revisionChoices on iOS). */
 export function revisionChoices(rock) {
   const last = rock.revisions.length - 1;
-  return rock.revisions.map((r, index) => ({ index, date: r.createdAt, isLatest: index === last, text: r.text })).reverse();
+  return rock.revisions.map((r, index) => ({ index, date: r.createdAt, isLatest: index === last, text: r.text }));
 }
 
 /** "Today, 5:19 PM" or "Oct 12, 3:04 PM". */
