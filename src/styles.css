@@ -111,5 +111,6 @@ textarea { resize: vertical; line-height: 1.5; }
 .prose { display: flex; flex-direction: column; gap: 14px; }
 .card > .segmented { display: flex; }
 .card > .segmented button { flex: 1; }
-.history { display: inline-flex; align-items: center; gap: 2px; }
-.chevron { min-width: 36px; font-size: 1.2rem; padding: 0 8px; }
+.history { display: inline-flex; align-items: center; gap: 8px; }
+.history select { font: inherit; font-size: 0.85rem; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border, #ccc); background: transparent; color: inherit; }
+.branch-note { color: var(--accent); }

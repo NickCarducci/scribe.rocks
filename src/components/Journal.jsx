@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { addRock, deleteRock, reviseRock, showRevision, watchRocks } from "../rocks.js";
+import { addRock, deleteRock, reviseRock, watchRocks } from "../rocks.js";
+import { revisionChoices, when } from "../revisions.js";
 import { downloadCSV } from "../csv.js";
 
 export default function Journal({ uid }) {
@@ -7,6 +8,8 @@ export default function Journal({ uid }) {
   const [error, setError] = useState(null);
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState(null); // rock id
+  // Version picked per rock this session; every rock opens on its newest.
+  const [picked, setPicked] = useState({});
 
   useEffect(() => watchRocks(uid, setRocks, (e) => setError(e.message)), [uid]);
 
@@ -66,43 +69,44 @@ export default function Journal({ uid }) {
         </p>
       ) : (
         <ul className="rocks">
-          {visible.map((rock) => (
+          {visible.map((rock) => {
+            const latest = rock.revisions.length - 1;
+            const index = picked[rock.id] ?? latest;
+            const shownText = rock.revisions[index]?.text ?? rock.text;
+            const older = index < latest;
+            return (
             <li key={rock.id} className="card rock">
               {editing === rock.id ? (
                 <RockEditor
-                  rock={rock}
+                  rock={{ ...rock, text: shownText }}
                   onCancel={() => setEditing(null)}
                   onSave={(text) => {
                     setEditing(null);
-                    act(reviseRock(uid, rock, text, "edited"));
+                    if (!older) {
+                      act(reviseRock(uid, { ...rock, text: rock.revisions[latest].text, revisionIndex: latest }, text, "edited"));
+                    } else if (text.trim() !== shownText && window.confirm("This is an older version. Branch into a new rock? The original stays as it is.")) {
+                      // As on iOS: changes to an older version always branch.
+                      addRock(uid, text)?.catch((err) => setError(err.message));
+                      setPicked((p) => ({ ...p, [rock.id]: latest }));
+                    }
                   }}
                 />
               ) : (
                 <>
-                  <p className="rock-text">{rock.text}</p>
+                  <p className="rock-text">{shownText}</p>
                   <div className="row">
                     {rock.revisions.length > 1 && (
-                      <div className="history" aria-label="Revisions">
-                        <button
-                          className="btn btn-quiet chevron"
-                          aria-label="Previous revision"
-                          disabled={rock.revisionIndex === 0}
-                          onClick={() => act(showRevision(uid, rock, rock.revisionIndex - 1))}
-                        >
-                          ‹
-                        </button>
-                        <span className="fine">
-                          {rock.revisionIndex + 1} of {rock.revisions.length}
-                        </span>
-                        <button
-                          className="btn btn-quiet chevron"
-                          aria-label="Next revision"
-                          disabled={rock.revisionIndex === rock.revisions.length - 1}
-                          onClick={() => act(showRevision(uid, rock, rock.revisionIndex + 1))}
-                        >
-                          ›
-                        </button>
-                      </div>
+                      <label className="history">
+                        <span className="sr-only">Version</span>
+                        <select value={index} onChange={(e) => setPicked((p) => ({ ...p, [rock.id]: Number(e.target.value) }))}>
+                          {revisionChoices(rock).map((c) => (
+                            <option key={c.index} value={c.index}>
+                              {c.isLatest ? `Latest · ${when(c.date)}` : when(c.date)}
+                            </option>
+                          ))}
+                        </select>
+                        {older && <span className="fine branch-note">editing branches a new rock</span>}
+                      </label>
                     )}
                     <time className="fine" dateTime={rock.createdAt.toISOString()}>
                       {rock.createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
@@ -122,7 +126,8 @@ export default function Journal({ uid }) {
                 </>
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </section>
