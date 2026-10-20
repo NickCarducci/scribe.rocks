@@ -31,11 +31,11 @@ const threeVersions = () => {
   return withRevision(r, "three", "suggestion", new Date("2026-10-09T10:00:00"));
 };
 
-test("versions run oldest to newest, latest marked", () => {
+test("versions are most recent first, latest marked", () => {
   const choices = revisionChoices(threeVersions());
-  assert.deepEqual(choices.map((c) => c.index), [0, 1, 2]);
-  assert.deepEqual(choices.map((c) => c.isLatest), [false, false, true]);
-  assert.equal(choices[0].text, "one");
+  assert.deepEqual(choices.map((c) => c.index), [2, 1, 0]);
+  assert.deepEqual(choices.map((c) => c.isLatest), [true, false, false]);
+  assert.equal(choices[2].text, "one");
 });
 
 test("dates read as today or month and day", () => {
