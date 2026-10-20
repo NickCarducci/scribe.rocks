@@ -9,8 +9,8 @@ test("escapes like the iOS export", () => {
   assert.equal(escapeField("line\nbreak"), '"line\nbreak"');
 });
 
-test("writes header and status", () => {
+test("writes header and text", () => {
   const d = new Date("2026-10-12T00:00:00Z");
-  const csv = rocksToCSV([{ text: "x", createdAt: d, updatedAt: d, isDiamond: true }]);
-  assert.equal(csv, "created_at,updated_at,status,text\n2026-10-12T00:00:00.000Z,2026-10-12T00:00:00.000Z,diamond,x\n");
+  const csv = rocksToCSV([{ text: "x", createdAt: d, updatedAt: d }]);
+  assert.equal(csv, "created_at,updated_at,text\n2026-10-12T00:00:00.000Z,2026-10-12T00:00:00.000Z,x\n");
 });

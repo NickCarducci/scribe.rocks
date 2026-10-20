@@ -29,7 +29,7 @@ export default function SignIn({ initialError }) {
       <div className="hero">
         <h1>Rough notes in. Final drafts out.</h1>
         <p className="muted">
-          Drop rocks — quick thoughts, first drafts. Polish the ones that matter into diamonds. Your
+          Drop rocks — quick thoughts, first drafts — and polish them with on-device suggestions. Your
           journal syncs privately between here and the iPhone app.
         </p>
       </div>

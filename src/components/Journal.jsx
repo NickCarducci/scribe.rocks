@@ -1,24 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
-import { addRock, deleteRock, reviseRock, showRevision, updateRock, watchRocks } from "../rocks.js";
+import { useEffect, useState } from "react";
+import { addRock, deleteRock, reviseRock, showRevision, watchRocks } from "../rocks.js";
 import { downloadCSV } from "../csv.js";
-
-const FILTERS = ["All", "Rocks", "Diamonds"];
 
 export default function Journal({ uid }) {
   const [rocks, setRocks] = useState(null);
   const [error, setError] = useState(null);
   const [draft, setDraft] = useState("");
-  const [filter, setFilter] = useState("All");
   const [editing, setEditing] = useState(null); // rock id
 
   useEffect(() => watchRocks(uid, setRocks, (e) => setError(e.message)), [uid]);
 
-  const visible = useMemo(() => {
-    if (!rocks) return [];
-    if (filter === "Rocks") return rocks.filter((r) => !r.isDiamond);
-    if (filter === "Diamonds") return rocks.filter((r) => r.isDiamond);
-    return rocks;
-  }, [rocks, filter]);
+  const visible = rocks ?? [];
 
   const save = (e) => {
     e.preventDefault();
@@ -60,13 +52,7 @@ export default function Journal({ uid }) {
       )}
 
       <div className="row">
-        <div className="segmented" role="tablist" aria-label="Filter">
-          {FILTERS.map((f) => (
-            <button key={f} role="tab" aria-selected={filter === f} onClick={() => setFilter(f)}>
-              {f}
-            </button>
-          ))}
-        </div>
+        <span />
         <button className="btn btn-quiet" disabled={!rocks?.length} onClick={() => downloadCSV(rocks)}>
           Export CSV
         </button>
@@ -76,12 +62,12 @@ export default function Journal({ uid }) {
         <p className="muted center">Loading your rocks…</p>
       ) : visible.length === 0 ? (
         <p className="muted center empty">
-          {rocks.length === 0 ? "No rocks yet. Write something above." : `No ${filter.toLowerCase()} yet.`}
+          No rocks yet. Write something above.
         </p>
       ) : (
         <ul className="rocks">
           {visible.map((rock) => (
-            <li key={rock.id} className={`card rock${rock.isDiamond ? " diamond" : ""}`}>
+            <li key={rock.id} className="card rock">
               {editing === rock.id ? (
                 <RockEditor
                   rock={rock}
@@ -122,14 +108,6 @@ export default function Journal({ uid }) {
                       {rock.createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                     </time>
                     <div className="actions">
-                      <button
-                        className="btn btn-quiet"
-                        aria-pressed={rock.isDiamond}
-                        title={rock.isDiamond ? "Back to rock" : "Mark as final draft"}
-                        onClick={() => act(updateRock(uid, rock, { isDiamond: !rock.isDiamond }))}
-                      >
-                        {rock.isDiamond ? "◆ Diamond" : "◇ Diamond"}
-                      </button>
                       <button className="btn btn-quiet" onClick={() => setEditing(rock.id)}>
                         Edit
                       </button>

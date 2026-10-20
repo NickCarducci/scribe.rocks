@@ -55,7 +55,6 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <span>A diamond is the final draft.</span>
         <a href="/privacy">Privacy</a>
         <a href="https://apps.apple.com/app/scriberocks/id6448929626">iPhone app</a>
       </footer>

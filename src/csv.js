@@ -9,11 +9,10 @@ export function rocksToCSV(rocks) {
     [
       rock.createdAt.toISOString(),
       rock.updatedAt.toISOString(),
-      rock.isDiamond ? "diamond" : "rock",
       escapeField(rock.text),
     ].join(","),
   );
-  return ["created_at,updated_at,status,text", ...rows].join("\n") + "\n";
+  return ["created_at,updated_at,text", ...rows].join("\n") + "\n";
 }
 
 export function downloadCSV(rocks) {

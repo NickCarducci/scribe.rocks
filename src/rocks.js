@@ -15,7 +15,7 @@ export { showingRevision, withRevision };
 
 // Same layout as FirestoreRockSyncService.swift:
 // scriberocks_users/{uid}/rocks/{UUID}
-//   { text, createdAt, updatedAt, isDiamond, revisions: [{text, createdAt, source}], revisionIndex, deleted? }
+//   { text, createdAt, updatedAt, revisions: [{text, createdAt, source}], revisionIndex, deleted? }
 // `text` is the revision being shown. Deletes are tombstones (deleted: true)
 // so other devices learn about them.
 
@@ -37,7 +37,6 @@ export function fromFirestore(id, data) {
     text: data.text,
     createdAt,
     updatedAt: data.updatedAt?.toDate() ?? createdAt,
-    isDiamond: data.isDiamond === true,
     revisions,
     revisionIndex: Math.min(Math.max(index, 0), revisions.length - 1),
     deleted: data.deleted === true,
@@ -65,7 +64,6 @@ function write(uid, rock) {
     text: rock.text,
     createdAt: Timestamp.fromDate(rock.createdAt),
     updatedAt: Timestamp.fromDate(rock.updatedAt),
-    isDiamond: rock.isDiamond,
     revisions: revisions.map((r) => ({ text: r.text, createdAt: Timestamp.fromDate(r.createdAt), source: r.source })),
     revisionIndex: rock.revisionIndex ?? revisions.length - 1,
     ...(rock.deleted ? { deleted: true } : {}),
@@ -92,7 +90,6 @@ export function addRock(uid, text) {
     text: trimmed,
     createdAt: now,
     updatedAt: now,
-    isDiamond: false,
     revisions: [{ text: trimmed, createdAt: now, source: "written" }],
     revisionIndex: 0,
   };
