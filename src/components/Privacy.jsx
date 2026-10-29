@@ -3,21 +3,27 @@ export default function Privacy() {
     <article className="card prose">
       <h1>Privacy</h1>
       <p>
-        Scriberocks is a journal. In the iPhone app, everything you write stays on your phone unless you sign in.
+        Scriberocks is a journal and writing tool. ScribeSLM, the language pipeline
+        inside the iPhone app, runs on your iPhone. Your writing is not sent to an
+        artificial-intelligence service, and Scriberocks does not collect keystrokes.
       </p>
       <p>
-        If you sign in (with Apple, Google, an email link, or your phone number), your rocks are
-        stored in your private account so they sync between the web and the iPhone app. Only you
-        can read them. We keep the sign-in details your provider shares with us (such as your name,
-        email, or phone number) and nothing else.
+        Rocks and their revision histories are stored on your iPhone. If you sign
+        in, they are also synchronized to your private Firebase account so they
+        can be used on the web and across supported sessions. We store the
+        account details your sign-in provider shares with us, such as your name
+        and email address.
       </p>
       <p>
-        On iPhone, the app may ask your device to share an age range. That stays on your phone and
-        is only used to involve a parent or guardian before anyone under 18 joins a group.
+        If you choose to join Groups, your membership and the posts you share are
+        stored in Firebase so Groups, moderation, and account deletion can work.
+        Group posts are associated with your account and author name.
       </p>
       <p>
-        You can export everything as a CSV, and you can delete your account at any time from the
-        Account page, which permanently deletes your synced rocks.
+        On iPhone, a declared age range stays on your device and is used for
+        age-appropriate Group controls. You can export your web journal as a
+        CSV and delete your account and synchronized data from the{" "}
+        <a href="/choices">Privacy choices</a> page.
       </p>
     </article>
   );

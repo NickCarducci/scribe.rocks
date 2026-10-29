@@ -6,12 +6,14 @@ import SignIn from "./components/SignIn.jsx";
 import Journal from "./components/Journal.jsx";
 import Account from "./components/Account.jsx";
 import Privacy from "./components/Privacy.jsx";
+import PrivacyChoices from "./components/PrivacyChoices.jsx";
 
 export default function App() {
   const [user, setUser] = useState(undefined); // undefined = still loading
   const [view, setView] = useState("journal");
   const [linkError, setLinkError] = useState(null);
   const isPrivacy = window.location.pathname.startsWith("/privacy");
+  const isChoices = window.location.pathname.startsWith("/choices");
 
   useEffect(() => onAuthStateChanged(auth, setUser), []);
 
@@ -43,6 +45,8 @@ export default function App() {
       <main>
         {isPrivacy ? (
           <Privacy />
+        ) : isChoices ? (
+          <PrivacyChoices user={user} linkError={linkError} />
         ) : user === undefined ? (
           <p className="muted center">Loading…</p>
         ) : user === null ? (
@@ -56,6 +60,7 @@ export default function App() {
 
       <footer className="footer">
         <a href="/privacy">Privacy</a>
+        <a href="/choices">Privacy choices</a>
         <a href="https://apps.apple.com/app/scriberocks/id6448929626">iPhone app</a>
       </footer>
     </div>
